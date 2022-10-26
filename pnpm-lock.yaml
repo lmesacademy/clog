@@ -2,10 +2,10 @@ lockfileVersion: 5.4
 
 specifiers:
   '@ava/typescript': ^1.1.1
-  '@bitauth/libauth': ^1.17.1
   '@istanbuljs/nyc-config-typescript': ^1.0.1
   '@logtail/node': ^0.1.12
   '@logtail/types': ^0.1.12
+  '@types/node': ^18.11.6
   '@typescript-eslint/eslint-plugin': ^4.0.1
   '@typescript-eslint/parser': ^4.0.1
   ava: ^3.12.1
@@ -30,8 +30,8 @@ specifiers:
   typescript: ^4.0.2
 
 dependencies:
-  '@bitauth/libauth': 1.19.1
   '@logtail/node': 0.1.12
+  '@types/node': 18.11.6
   pino: 8.7.0
   pino-pretty: 9.1.1
 
@@ -275,11 +275,6 @@ packages:
       '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
     dev: true
-
-  /@bitauth/libauth/1.19.1:
-    resolution: {integrity: sha512-R524tD5VwOt3QRHr7N518nqTVR/HKgfWL4LypekcGuNQN8R4PWScvuRcRzrY39A28kLztMv+TJdiKuMNbkU1ug==}
-    engines: {node: '>=8.9'}
-    dev: false
 
   /@commitlint/config-validator/17.1.0:
     resolution: {integrity: sha512-Q1rRRSU09ngrTgeTXHq6ePJs2KrI+axPTgkNYDWSJIuS1Op4w3J30vUfSXjwn5YEJHklK3fSqWNHmBhmTR7Vdg==}
@@ -724,7 +719,6 @@ packages:
 
   /@types/node/18.11.6:
     resolution: {integrity: sha512-j3CEDa2vd96K0AXF8Wur7UucACvnjkk8hYyQAHhUNciabZLDl9nfAEVUSwmh245OOZV15bRA3Y590Gi5jUcDJg==}
-    dev: true
 
   /@types/normalize-package-data/2.4.1:
     resolution: {integrity: sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==}

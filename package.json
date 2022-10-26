@@ -44,6 +44,7 @@
   },
   "dependencies": {
     "@logtail/node": "^0.1.12",
+    "@types/node": "^18.11.6",
     "pino": "^8.7.0",
     "pino-pretty": "^9.1.1"
   },
