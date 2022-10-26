@@ -20,7 +20,7 @@
       "error",
       { "allowWholeFile": true }
     ],
-    "eslint-comments/no-unused-disable": "error",
+    "eslint-comments/no-unused-disable": "off",
     "import/order": [
       "error",
       { "newlines-between": "always", "alphabetize": { "order": "asc" } }
