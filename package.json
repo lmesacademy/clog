@@ -1,5 +1,5 @@
 {
-  "name": "clog",
+  "name": "@lmes/clog",
   "version": "0.0.1",
   "description": "Captures console.log and send to logtail",
   "main": "build/main/index.js",
