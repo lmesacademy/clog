@@ -1,0 +1,11 @@
+{
+  "devDependencies": {
+    "ts-node": "^10.9.1"
+  },
+  "scripts": {
+    "start": "nodemon index.ts"
+  },
+  "dependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
