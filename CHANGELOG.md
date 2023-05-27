@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.5](https://github.com/lmesacademy/clog/compare/v0.0.4...v0.0.5) (2023-05-27)
+
+
+### Bug Fixes
+
+* set default options ([25ee964](https://github.com/lmesacademy/clog/commit/25ee9648982c2a7dc203c371fe623f346f45664c))
+
 ### [0.0.4](https://github.com/lmesacademy/clog/compare/v0.0.3...v0.0.4) (2023-05-27)
 
 
