@@ -83,16 +83,21 @@ export class Clog {
               : 'hh:MM:ss TT',
           ignore:
             options?.ignore !== undefined ? options.ignore : 'pid,hostname',
-          crlf: options?.crlf,
-          errorLikeObjectKeys: options?.errorLikeObjectKeys,
-          errorProps: options?.errorProps,
-          levelFirst: options?.levelFirst,
-          messageKey: options?.messageKey,
-          levelKey: options?.levelKey,
-          messageFormat: options?.messageFormat,
-          timestampKey: options?.timestampKey,
+          crlf: options?.crlf !== undefined ? options.crlf : false,
+          errorLikeObjectKeys: options?.errorLikeObjectKeys || ['err', 'error'],
+          errorProps: options?.errorProps || '',
+          levelFirst:
+            options?.levelFirst !== undefined ? options.levelFirst : false,
+          messageKey: options?.messageKey || 'msg',
+          levelKey: options?.levelKey || 'level',
+          messageFormat:
+            options?.messageFormat !== undefined
+              ? options.messageFormat
+              : false,
+          timestampKey: options?.timestampKey || 'time',
           include: options?.include,
-          hideObject: options?.hideObject,
+          hideObject:
+            options?.hideObject !== undefined ? options.hideObject : false,
           config: options?.config,
           customColors: options?.customColors,
           customLevels: options?.customLevels,
@@ -102,12 +107,9 @@ export class Clog {
           sync: options?.sync,
           append: options?.append,
           mkdir: options?.mkdir,
-          customPrettifiers: options?.customPrettifiers,
         },
       },
     });
-
-    logger.info(options);
 
     isLoggerInitialized = true;
   }
