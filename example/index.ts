@@ -1,6 +1,6 @@
 import { Clog } from '../src';
 
-Clog.init();
+Clog.init('', { singleLine: false });
 
 console.log('Hello World');
 
