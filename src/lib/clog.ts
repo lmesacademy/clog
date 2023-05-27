@@ -122,8 +122,8 @@ export class Clog {
 }
 
 function log(...args: any) {
-  logger.info(args);
-  logtail.info(args);
+  if (isLoggerInitialized) logger.info(args);
+  if (logtail.isInitialized) logtail.info(args);
 }
 
 function info(...args: any) {
