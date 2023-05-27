@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.6](https://github.com/lmesacademy/clog/compare/v0.0.5...v0.0.6) (2023-05-27)
+
+
+### Bug Fixes
+
+* log only if logger, logtail is initialized ([dc3d5bf](https://github.com/lmesacademy/clog/commit/dc3d5bfada7f3479973e14417eeeb1b3c2df88d4))
+
 ### [0.0.5](https://github.com/lmesacademy/clog/compare/v0.0.4...v0.0.5) (2023-05-27)
 
 
