@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.8](https://github.com/lmesacademy/clog/compare/v0.0.3...v0.0.8) (2024-09-02)
+
+
+### Features
+
+* add support for pino pretty ([1ac3025](https://github.com/lmesacademy/clog/commit/1ac30252039d60fad9d62072dcb75a048f122d57))
+
+
+### Bug Fixes
+
+* log only if logger, logtail is initialized ([dc3d5bf](https://github.com/lmesacademy/clog/commit/dc3d5bfada7f3479973e14417eeeb1b3c2df88d4))
+* set default options ([25ee964](https://github.com/lmesacademy/clog/commit/25ee9648982c2a7dc203c371fe623f346f45664c))
+
 ### [0.0.7](https://github.com/lmesacademy/clog/compare/v0.0.6...v0.0.7) (2023-05-27)
 
 
