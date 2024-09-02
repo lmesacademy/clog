@@ -46,7 +46,7 @@
     "node": ">=10"
   },
   "dependencies": {
-    "@logtail/node": "^0.1.17",
+    "@logtail/node": "^0.5.0",
     "@types/node": "^18.16.16",
     "pino": "^8.14.1",
     "pino-pretty": "^9.4.0"
