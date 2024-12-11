@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.9](https://github.com/lmesacademy/clog/compare/v0.0.8...v0.0.9) (2024-12-11)
+
+
+### Features
+
+* send trace, runtime and system details to logtail ([dec2989](https://github.com/lmesacademy/clog/commit/dec29895ca6d595b4c8b665b2a7dd94fba41d517))
+
 ### [0.0.8](https://github.com/lmesacademy/clog/compare/v0.0.3...v0.0.8) (2024-09-02)
 
 
