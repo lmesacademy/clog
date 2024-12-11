@@ -1,6 +1,7 @@
 import { Logtail } from '@logtail/node';
 import { ILogtailOptions } from '@logtail/types';
 import pino, { Logger, LoggerOptions } from 'pino';
+import * as os from 'os';
 
 const originalConsole = console; // Take a copy of the original console
 
@@ -55,6 +56,7 @@ let logger: Logger<LoggerOptions>;
 export class Clog {
   // Access original console
   static console = originalConsole;
+  static logsQueue: any[] = [];
 
   static init(
     sourceToken?: string,
@@ -112,6 +114,30 @@ export class Clog {
     });
 
     isLoggerInitialized = true;
+
+    // log all remaining logs in the queue based on their type
+    for (let i = 0; i < Clog.logsQueue.length; i++) {
+      const log = Clog.logsQueue[i];
+      switch (log.type) {
+        case 'info':
+          this.info(log.args);
+          break;
+        case 'warn':
+          this.warn(log.args);
+          break;
+        case 'error':
+          this.error(log.args);
+          break;
+        case 'debug':
+          this.debug(log.args);
+          break;
+        default:
+          this.log(log.args);
+          break;
+      }
+    }
+
+    this.logsQueue = [];
   }
 
   static log = log;
@@ -121,29 +147,108 @@ export class Clog {
   static debug = debug;
 }
 
+function getRuntimeInfo(stack: string | undefined) {
+  if (!stack) return {};
+  const stackLines = stack.split('\n');
+  if (stackLines.length < 3) return {};
+  const callerLine = stackLines[2];
+  const match = callerLine.match(/\((.*):(\d+):(\d+)\)/);
+  if (!match) return {};
+  return {
+    file: match[1],
+    line: parseInt(match[2], 10),
+    column: parseInt(match[3], 10),
+    type: 'console',
+    function: 'log',
+    method: 'log',
+  };
+}
+
+function getSystemInfo(): any {
+  return {
+    main_file: require.main?.filename,
+    pid: process.pid,
+    platform: process.platform,
+    arch: process.arch,
+    version: process.version,
+    hostname: os.hostname(),
+    uptime: os.uptime(),
+    freemem: os.freemem(),
+    totalmem: os.totalmem(),
+    ip: os.networkInterfaces().lo0?.[0]?.address,
+    environment: process.env.NODE_ENV,
+  };
+}
+
+function getContext(runtime: any) {
+  return {
+    runtime,
+    system: getSystemInfo(),
+  };
+}
+
 function log(...args: any) {
-  if (isLoggerInitialized) logger.info(args);
-  if (logtail.isInitialized) logtail.info(args);
+  const stack = new Error().stack;
+  const runtime = getRuntimeInfo(stack);
+
+  if (isLoggerInitialized) {
+    logger.info(args);
+  } else {
+    Clog.logsQueue.push({ type: 'log', args });
+  }
+  if (logtail.isInitialized)
+    logtail.info(args, { context: getContext(runtime) });
 }
 
 function info(...args: any) {
-  if (isLoggerInitialized) logger.info(args);
-  if (logtail.isInitialized) logtail.info(args);
+  const stack = new Error().stack;
+  const runtime = getRuntimeInfo(stack);
+
+  if (isLoggerInitialized) {
+    logger.info(args);
+  } else {
+    Clog.logsQueue.push({ type: 'info', args });
+  }
+  if (logtail.isInitialized)
+    logtail.info(args, { context: getContext(runtime) });
 }
 
 function warn(...args: any) {
-  if (isLoggerInitialized) logger.warn(args);
-  if (logtail.isInitialized) logtail.warn(args);
+  const stack = new Error().stack;
+  const runtime = getRuntimeInfo(stack);
+
+  if (isLoggerInitialized) {
+    logger.warn(args);
+  } else {
+    Clog.logsQueue.push({ type: 'warn', args });
+  }
+  if (logtail.isInitialized)
+    logtail.warn(args, { context: getContext(runtime) });
 }
 
 function debug(...args: any) {
-  if (isLoggerInitialized) logger.debug(args);
-  if (logtail.isInitialized) logtail.debug(args);
+  const stack = new Error().stack;
+  const runtime = getRuntimeInfo(stack);
+
+  if (isLoggerInitialized) {
+    logger.debug(args);
+  } else {
+    Clog.logsQueue.push({ type: 'debug', args });
+  }
+  if (logtail.isInitialized)
+    logtail.debug(args, { stack, context: getContext(runtime) });
 }
 
 function error(...args: any) {
-  if (isLoggerInitialized) logger.error(args);
-  if (logtail.isInitialized) logtail.error(args);
+  const stack = new Error().stack;
+  const runtime = getRuntimeInfo(stack);
+  if (isLoggerInitialized) {
+    logger.error(args);
+  } else {
+    Clog.logsQueue.push({ type: 'error', args });
+  }
+  if (logtail.isInitialized)
+    logtail.error(args, { stack, context: getContext(runtime) });
 }
 
 console.log = log;
