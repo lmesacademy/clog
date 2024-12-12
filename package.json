@@ -98,9 +98,7 @@
     ]
   },
   "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    }
+
   },
   "prettier": {
     "singleQuote": true
