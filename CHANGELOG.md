@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.10](https://github.com/lmesacademy/clog/compare/v0.0.9...v0.0.10) (2024-12-12)
+
+
+### Bug Fixes
+
+* **example:** get logtail token from env ([4e92bc3](https://github.com/lmesacademy/clog/commit/4e92bc3c047340d8cd95d74bc883503f777f1479))
+
 ### [0.0.9](https://github.com/lmesacademy/clog/compare/v0.0.8...v0.0.9) (2024-12-11)
 
 
