@@ -92,6 +92,9 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-function"><a href="globals.html#debug" class="tsd-kind-icon">debug</a></li>
 								<li class="tsd-kind-function"><a href="globals.html#error" class="tsd-kind-icon">error</a></li>
+								<li class="tsd-kind-function"><a href="globals.html#getcontext" class="tsd-kind-icon">get<wbr>Context</a></li>
+								<li class="tsd-kind-function"><a href="globals.html#getruntimeinfo" class="tsd-kind-icon">get<wbr>Runtime<wbr>Info</a></li>
+								<li class="tsd-kind-function"><a href="globals.html#getsysteminfo" class="tsd-kind-icon">get<wbr>System<wbr>Info</a></li>
 								<li class="tsd-kind-function"><a href="globals.html#info" class="tsd-kind-icon">info</a></li>
 								<li class="tsd-kind-function"><a href="globals.html#log" class="tsd-kind-icon">log</a></li>
 								<li class="tsd-kind-function"><a href="globals.html#warn" class="tsd-kind-icon">warn</a></li>
@@ -114,7 +117,7 @@
 					<div class="tsd-signature tsd-kind-icon">Clog<wbr>Options<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>append<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>colorize<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>colorizeObjects<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>config<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>crlf<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>customColors<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>customLevels<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>customPrettifiers<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>errorLikeObjectKeys<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">; </span>errorProps<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>hideObject<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>ignore<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>include<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>levelFirst<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>levelKey<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>levelLabel<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>messageFormat<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>messageKey<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>minimumLevel<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>mkdir<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>singleLine<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>sync<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>timestampKey<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>translateTime<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>useOnlyCustomProps<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> }</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/f32273c/src/lib/clog.ts#L25">lib/clog.ts:25</a></li>
+							<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/4e92bc3/src/lib/clog.ts#L27">lib/clog.ts:27</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -207,7 +210,7 @@
 					<div class="tsd-signature tsd-kind-icon">is<wbr>Logger<wbr>Initialized<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/f32273c/src/lib/clog.ts#L23">lib/clog.ts:23</a></li>
+							<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/4e92bc3/src/lib/clog.ts#L25">lib/clog.ts:25</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -217,7 +220,7 @@
 					<div class="tsd-signature tsd-kind-icon">logger<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Logger</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">LoggerOptions</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/f32273c/src/lib/clog.ts#L53">lib/clog.ts:53</a></li>
+							<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/4e92bc3/src/lib/clog.ts#L55">lib/clog.ts:55</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -227,7 +230,7 @@
 					<div class="tsd-signature tsd-kind-icon">original<wbr>Console<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Console</span><span class="tsd-signature-symbol"> = console</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/f32273c/src/lib/clog.ts#L5">lib/clog.ts:5</a></li>
+							<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/4e92bc3/src/lib/clog.ts#L7">lib/clog.ts:7</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -244,7 +247,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/f32273c/src/lib/clog.ts#L139">lib/clog.ts:139</a></li>
+									<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/4e92bc3/src/lib/clog.ts#L230">lib/clog.ts:230</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -267,7 +270,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/f32273c/src/lib/clog.ts#L144">lib/clog.ts:144</a></li>
+									<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/4e92bc3/src/lib/clog.ts#L243">lib/clog.ts:243</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -281,6 +284,77 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="getcontext" class="tsd-anchor"></a>
+					<h3>get<wbr>Context</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Context<span class="tsd-signature-symbol">(</span>runtime<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{ </span>runtime<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>system<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> }</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/4e92bc3/src/lib/clog.ts#L184">lib/clog.ts:184</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>runtime: <span class="tsd-signature-type">any</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{ </span>runtime<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">; </span>system<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol"> }</span></h4>
+							<ul class="tsd-parameters">
+								<li class="tsd-parameter">
+									<h5>runtime<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></h5>
+								</li>
+								<li class="tsd-parameter">
+									<h5>system<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></h5>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="getruntimeinfo" class="tsd-anchor"></a>
+					<h3>get<wbr>Runtime<wbr>Info</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Runtime<wbr>Info<span class="tsd-signature-symbol">(</span>stack<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>column<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>file<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>function<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>line<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>method<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/4e92bc3/src/lib/clog.ts#L151">lib/clog.ts:151</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>stack: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">{ </span>column<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>file<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>function<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>line<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">; </span>method<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> }</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
+					<a name="getsysteminfo" class="tsd-anchor"></a>
+					<h3>get<wbr>System<wbr>Info</h3>
+					<ul class="tsd-signatures tsd-kind-function">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>System<wbr>Info<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/4e92bc3/src/lib/clog.ts#L168">lib/clog.ts:168</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">any</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function">
 					<a name="info" class="tsd-anchor"></a>
 					<h3>info</h3>
 					<ul class="tsd-signatures tsd-kind-function">
@@ -290,7 +364,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/f32273c/src/lib/clog.ts#L129">lib/clog.ts:129</a></li>
+									<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/4e92bc3/src/lib/clog.ts#L204">lib/clog.ts:204</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -313,7 +387,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/f32273c/src/lib/clog.ts#L124">lib/clog.ts:124</a></li>
+									<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/4e92bc3/src/lib/clog.ts#L191">lib/clog.ts:191</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -336,7 +410,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/f32273c/src/lib/clog.ts#L134">lib/clog.ts:134</a></li>
+									<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/4e92bc3/src/lib/clog.ts#L217">lib/clog.ts:217</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -358,7 +432,7 @@
 					<div class="tsd-signature tsd-kind-icon">logtail<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/f32273c/src/lib/clog.ts#L7">lib/clog.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/4e92bc3/src/lib/clog.ts#L9">lib/clog.ts:9</a></li>
 						</ul>
 					</aside>
 					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal">
@@ -367,7 +441,7 @@
 						<div class="tsd-signature tsd-kind-icon">is<wbr>Initialized<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/f32273c/src/lib/clog.ts#L8">lib/clog.ts:8</a></li>
+								<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/4e92bc3/src/lib/clog.ts#L10">lib/clog.ts:10</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -381,7 +455,7 @@
 							<li class="tsd-description">
 								<aside class="tsd-sources">
 									<ul>
-										<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/f32273c/src/lib/clog.ts#L18">lib/clog.ts:18</a></li>
+										<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/4e92bc3/src/lib/clog.ts#L20">lib/clog.ts:20</a></li>
 									</ul>
 								</aside>
 								<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -398,7 +472,7 @@
 							<li class="tsd-description">
 								<aside class="tsd-sources">
 									<ul>
-										<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/f32273c/src/lib/clog.ts#L12">lib/clog.ts:12</a></li>
+										<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/4e92bc3/src/lib/clog.ts#L14">lib/clog.ts:14</a></li>
 									</ul>
 								</aside>
 								<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -415,7 +489,7 @@
 							<li class="tsd-description">
 								<aside class="tsd-sources">
 									<ul>
-										<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/f32273c/src/lib/clog.ts#L9">lib/clog.ts:9</a></li>
+										<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/4e92bc3/src/lib/clog.ts#L11">lib/clog.ts:11</a></li>
 									</ul>
 								</aside>
 								<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -432,7 +506,7 @@
 							<li class="tsd-description">
 								<aside class="tsd-sources">
 									<ul>
-										<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/f32273c/src/lib/clog.ts#L15">lib/clog.ts:15</a></li>
+										<li>Defined in <a href="https://github.com/lmesacademy/clog/blob/4e92bc3/src/lib/clog.ts#L17">lib/clog.ts:17</a></li>
 									</ul>
 								</aside>
 								<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -472,6 +546,15 @@
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#error" class="tsd-kind-icon">error</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getcontext" class="tsd-kind-icon">get<wbr>Context</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getruntimeinfo" class="tsd-kind-icon">get<wbr>Runtime<wbr>Info</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#getsysteminfo" class="tsd-kind-icon">get<wbr>System<wbr>Info</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#info" class="tsd-kind-icon">info</a>
