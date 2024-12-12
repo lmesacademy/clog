@@ -1,7 +1,8 @@
+import * as os from 'os';
+
 import { Logtail } from '@logtail/node';
 import { ILogtailOptions } from '@logtail/types';
 import pino, { Logger, LoggerOptions } from 'pino';
-import * as os from 'os';
 
 const originalConsole = console; // Take a copy of the original console
 
