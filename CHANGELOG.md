@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.11](https://github.com/lmesacademy/clog/compare/v0.0.10...v0.0.11) (2025-04-19)
+
+
+### Bug Fixes
+
+* **lib:** import order ([0b1d9a1](https://github.com/lmesacademy/clog/commit/0b1d9a14bbbbb38efc3ce15bb9ea8e36c074539b))
+
 ### [0.0.10](https://github.com/lmesacademy/clog/compare/v0.0.9...v0.0.10) (2024-12-12)
 
 
