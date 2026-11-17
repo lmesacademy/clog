@@ -1,8 +1,9 @@
 # Clog
 
-Levelled logger for Node and Bun services. It prints one line per log to
-stdout/stderr, ships the same line to Better Stack (Logtail), and reports the
-file and line **of the code that logged**, not of the logger.
+A bridge from `console.*` to Better Stack (Logtail) for Node and Bun services.
+Each log is shipped with the file and line **of the code that logged**, not of
+the logger. In development the console prints exactly what it would print
+without clog.
 
 ```ts
 import { Clog, logger } from '@lmes/clog';
@@ -14,17 +15,21 @@ logger.error('refund failed', err);         // the error's stack is kept
 console.log('still works');                 // console.* is routed through clog
 ```
 
-In a container (no TTY) each line is JSON:
+## What gets printed
+
+**At a terminal (`console` mode, the dev default)** clog is only a bridge: the
+real `console.log` prints its arguments untouched. No timestamp, level, caller,
+colours or reformatting are added, and `LOG_LEVEL` does not hide `console.*`
+calls. The only thing clog does is forward the log to Better Stack.
+
+**In a container (`json` mode, when stdout is not a TTY)** each log is one JSON
+line, so a log collector can read the level, caller and fields:
 
 ```json
 {"orderId":42,"time":"2026-11-17T06:17:27.089Z","level":"info","service":"payment-service","caller":"src/razorpay/refund.ts:88","msg":"order paid"}
 ```
 
-At a terminal it is readable text:
-
-```
-06:17:27.089 INFO  src/razorpay/refund.ts:88 order paid { orderId: 42 }
-```
+Set `LOG_FORMAT=console` to keep the plain console output in a container too.
 
 ## Configuration
 
@@ -32,8 +37,8 @@ At a terminal it is readable text:
 |---|---|---|---|
 | Better Stack token | `Clog.init(token)` | `LOGTAIL_TOKEN` | none: nothing is shipped |
 | Better Stack ingesting host | `Clog.init(token, {}, { endpoint })` | `LOGTAIL_ENDPOINT` | `in.logs.betterstack.com` (older sources only) |
-| Lowest level | `{ level: 'warn' }` | `LOG_LEVEL` | `info` |
-| Output | `{ format: 'json' \| 'pretty' }` | `LOG_FORMAT` | `pretty` on a TTY, else `json` |
+| Lowest level shipped (and printed by `logger.*` and in `json` mode) | `{ level: 'warn' }` | `LOG_LEVEL` | `info` |
+| Output | `{ format: 'console' \| 'json' }` | `LOG_FORMAT` | `console` on a TTY, else `json` |
 | Service name | `{ service: 'chat-service' }` | `SERVICE_NAME` | `npm_package_name` |
 | Patch console | `{ patchConsole: false }` | | `true` |
 | Wrapper files to skip | `{ ignoreFiles: ['src/logger.ts'] }` | | none |
@@ -92,7 +97,7 @@ the version itself.
   forever if `init` was never called).
 - **`console.log` is `info` and `LOG_LEVEL` applies.** `console.debug` lines
   disappear unless `LOG_LEVEL=debug`.
-- **Output is JSON in containers.** Set `LOG_FORMAT=pretty` to keep text.
+- **Output is JSON in containers.** Set `LOG_FORMAT=console` to keep plain console output.
 - **`Clog.init()` with no token reads `LOGTAIL_TOKEN`.**
 - **New Better Stack sources need their ingesting host** in `LOGTAIL_ENDPOINT`;
   0.0.x silently sent them to the legacy host.

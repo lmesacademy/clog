@@ -143,6 +143,60 @@ describe.each([
   });
 });
 
+/** Runs a script and returns stdout and stderr exactly as written. */
+function runRaw(command, args, env = {}) {
+  return new Promise((resolve) => {
+    const child = spawn(command, args, {
+      cwd: fixtures,
+      env: { ...process.env, LOG_LEVEL: '', ...env },
+    });
+    let stdout = '';
+    let stderr = '';
+    child.stdout.on('data', (chunk) => (stdout += chunk));
+    child.stderr.on('data', (chunk) => (stderr += chunk));
+    child.on('close', (code) => resolve({ code, stdout, stderr }));
+  });
+}
+
+describe.each([['node'], ['bun']])('console mode under %s', (command) => {
+  test('prints exactly what the real console prints', async () => {
+    const plain = await runRaw(command, ['identity.js']);
+    const bridged = await runRaw(command, ['identity.js', '--clog'], {
+      LOG_FORMAT: 'console',
+      // A level that would hide most lines: console.* must still print them.
+      LOG_LEVEL: 'error',
+    });
+
+    expect(bridged.code).toBe(0);
+    expect(bridged.stdout).toBe(plain.stdout);
+    expect(bridged.stderr).toBe(plain.stderr);
+    expect(plain.stdout).toContain('Hello World');
+  });
+
+  test(
+    'still ships to Better Stack',
+    async () => {
+      const sink = await startSink();
+      try {
+        const { stdout } = await runRaw(command, ['ship.js'], {
+          LOG_FORMAT: 'console',
+          LOGTAIL_ENDPOINT: sink.endpoint,
+        });
+        // Node and Bun format the object differently; what matters is that
+        // it is the runtime's own console output, with nothing added.
+        expect(stdout.startsWith('shipped info {')).toBe(true);
+        expect(stdout).not.toContain('"level"');
+      } finally {
+        await sink.close();
+      }
+      const info = sink.received.find((log) => log.message === 'shipped info');
+      expect(info).toBeDefined();
+      expect(info.caller).toBe('ship.js:8');
+    },
+    20000
+  );
+});
+
 describe.each([['node'], ['bun']])('Better Stack under %s', (command) => {
   test(
     'ships with the real caller and flushes on exit',

@@ -1,6 +1,6 @@
 import * as os from 'os';
 import * as path from 'path';
-import { format, inspect } from 'util';
+import { format } from 'util';
 
 import { Logtail } from '@logtail/node';
 
@@ -11,15 +11,25 @@ import { Logtail } from '@logtail/node';
 export const LEVELS = ['error', 'warn', 'info', 'debug'] as const;
 export type Level = (typeof LEVELS)[number];
 
-/** `json` for containers and log shippers, `pretty` for a person at a terminal. */
-export type Format = 'json' | 'pretty';
+/**
+ * What clog prints locally.
+ *
+ * - `console`: exactly what the real console would print, untouched. clog
+ *   only forwards the line to Better Stack. This is the dev default.
+ * - `json`: one JSON line per log with level, caller and fields, for
+ *   containers whose stdout is collected.
+ */
+export type Format = 'json' | 'console';
+
+/** The console methods clog bridges. */
+type ConsoleMethod = 'log' | 'info' | 'warn' | 'error' | 'debug';
 
 export type ClogOptions = {
   /** Shown on every line and in Better Stack. Defaults to SERVICE_NAME, then npm_package_name. */
   service?: string;
   /** Lowest level that is printed and shipped. Defaults to LOG_LEVEL, then `info`. */
   level?: Level;
-  /** Defaults to LOG_FORMAT, then `pretty` on a TTY and `json` everywhere else. */
+  /** Defaults to LOG_FORMAT, then `console` on a TTY and `json` everywhere else. */
   format?: Format;
   /**
    * Route console.log/info/warn/error/debug through clog. Default true, so a
@@ -50,7 +60,7 @@ export type LogtailOptions = Record<string, any>;
  */
 const LEGACY_ENDPOINT = 'https://in.logs.betterstack.com';
 
-const originalConsole = {
+const originalConsole: Record<ConsoleMethod, (...args: unknown[]) => void> = {
   log: console.log,
   info: console.info,
   warn: console.warn,
@@ -143,8 +153,9 @@ function threshold(): number {
 function outputFormat(): Format {
   if (state.format) return state.format;
   const configured = String(process.env.LOG_FORMAT || '').toLowerCase();
-  if (configured === 'json' || configured === 'pretty') return configured;
-  return process.stdout.isTTY ? 'pretty' : 'json';
+  if (configured === 'json') return 'json';
+  if (configured === 'console') return 'console';
+  return process.stdout.isTTY ? 'console' : 'json';
 }
 
 function serviceName(): string | undefined {
@@ -241,43 +252,55 @@ function safeStringify(value: unknown): string {
   });
 }
 
-const COLORS: Record<Level, string> = {
-  error: '\x1b[31m',
-  warn: '\x1b[33m',
-  info: '\x1b[36m',
-  debug: '\x1b[90m',
-};
-const DIM = '\x1b[2m';
-const RESET = '\x1b[0m';
-
 function writeLine(level: Level, line: string): void {
   const stream =
     level === 'error' || level === 'warn' ? process.stderr : process.stdout;
   stream.write(line + '\n');
 }
 
-function emit(level: Level, args: unknown[]): void {
-  if (LEVELS.indexOf(level) > threshold()) return;
+/**
+ * Where every log goes.
+ *
+ * `fromConsole` is true for a patched console.* call. In console mode those
+ * are printed by the real console no matter what LOG_LEVEL says, because a
+ * bridge should not hide what the code asked to print. LOG_LEVEL still
+ * decides what is shipped, and what `logger.*` prints.
+ */
+function emit(
+  level: Level,
+  method: ConsoleMethod,
+  args: unknown[],
+  fromConsole: boolean
+): void {
+  const enabled = LEVELS.indexOf(level) <= threshold();
+  const mode = outputFormat();
 
   if (writing) {
-    // Re-entered from inside clog (Logtail reporting a failed send). Write it
-    // plainly and do not ship it, or a broken network becomes an endless loop.
-    process.stderr.write(`[clog] ${format(...args)}\n`);
+    // Re-entered from inside clog. Print it and do not ship it, or a broken
+    // network becomes an endless loop.
+    originalConsole.error(...args);
     return;
   }
 
   writing = true;
   try {
+    if (mode === 'console' && (enabled || fromConsole)) {
+      originalConsole[method](...args);
+    }
+    if (!enabled) return;
+
     const caller = findCaller();
 
     // Logtail reports a failed send through console.error from its batch
     // timer, outside the `writing` guard. Shipping that report would fail the
-    // same way and queue yet another one, so print it and stop there.
+    // same way and queue yet another one, so it is printed and never shipped.
     if (caller && caller.file.includes(`${path.sep}@logtail${path.sep}`)) {
-      const text = args
-        .map((arg) => (arg instanceof Error ? arg.message : format(arg)))
-        .join(' ');
-      process.stderr.write(`[clog] Better Stack send failed: ${text}\n`);
+      if (mode === 'json') {
+        const text = args
+          .map((arg) => (arg instanceof Error ? arg.message : format(arg)))
+          .join(' ');
+        process.stderr.write(`[clog] Better Stack send failed: ${text}\n`);
+      }
       return;
     }
 
@@ -286,14 +309,13 @@ function emit(level: Level, args: unknown[]): void {
       : undefined;
     const entry = buildEntry(args);
     const service = serviceName();
-    const time = new Date().toISOString();
 
-    if (outputFormat() === 'json') {
+    if (mode === 'json') {
       writeLine(
         level,
         safeStringify({
           ...entry.fields,
-          time,
+          time: new Date().toISOString(),
           level,
           service,
           caller: callerText,
@@ -301,21 +323,6 @@ function emit(level: Level, args: unknown[]): void {
           err: entry.err,
         })
       );
-    } else {
-      // Colours only for a terminal; LOG_FORMAT=pretty piped to a file stays plain.
-      const colors = Boolean(process.stdout.isTTY);
-      const paint = (code: string, text: string) =>
-        colors ? `${code}${text}${RESET}` : text;
-      const parts = [
-        paint(DIM, time.slice(11, 23)),
-        paint(COLORS[level], level.toUpperCase().padEnd(5)),
-        callerText ? paint(DIM, callerText) : '',
-        entry.message,
-        entry.fields ? inspect(entry.fields, { colors, depth: 4 }) : '',
-      ].filter(Boolean);
-      let line = parts.join(' ');
-      if (entry.err?.stack) line += `\n${entry.err.stack}`;
-      writeLine(level, line);
     }
 
     if (state.logtail) {
@@ -366,11 +373,11 @@ function systemInfo(): Record<string, unknown> {
 
 function patchConsole(): void {
   if (state.consolePatched) return;
-  console.log = (...args: unknown[]) => emit('info', args);
-  console.info = (...args: unknown[]) => emit('info', args);
-  console.warn = (...args: unknown[]) => emit('warn', args);
-  console.error = (...args: unknown[]) => emit('error', args);
-  console.debug = (...args: unknown[]) => emit('debug', args);
+  console.log = (...args: unknown[]) => emit('info', 'log', args, true);
+  console.info = (...args: unknown[]) => emit('info', 'info', args, true);
+  console.warn = (...args: unknown[]) => emit('warn', 'warn', args, true);
+  console.error = (...args: unknown[]) => emit('error', 'error', args, true);
+  console.debug = (...args: unknown[]) => emit('debug', 'debug', args, true);
   state.consolePatched = true;
 }
 
@@ -385,13 +392,13 @@ function restoreConsole(): void {
  */
 export const logger = {
   /** A failure. */
-  error: (...args: unknown[]) => emit('error', args),
+  error: (...args: unknown[]) => emit('error', 'error', args, false),
   /** Survivable, but someone should know. */
-  warn: (...args: unknown[]) => emit('warn', args),
+  warn: (...args: unknown[]) => emit('warn', 'warn', args, false),
   /** Lifecycle and one line per completed piece of work. */
-  info: (...args: unknown[]) => emit('info', args),
+  info: (...args: unknown[]) => emit('info', 'info', args, false),
   /** Per-event tracing. Off unless LOG_LEVEL=debug. */
-  debug: (...args: unknown[]) => emit('debug', args),
+  debug: (...args: unknown[]) => emit('debug', 'debug', args, false),
 };
 
 export class Clog {
