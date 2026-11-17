@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0](https://github.com/lmesacademy/clog/compare/v0.0.11...v0.1.0) (2026-11-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* console is patched by Clog.init() instead of on import,
+console.log logs at info under LOG_LEVEL, and output is JSON when stdout is
+not a TTY.
+
+### Features
+
+* rewrite clog to report the real caller line ([526af3f](https://github.com/lmesacademy/clog/commit/526af3f748b3de392fa6ec929d8bb5acf504a0df))
+
 ### [0.0.11](https://github.com/lmesacademy/clog/compare/v0.0.10...v0.0.11) (2025-04-19)
 
 
