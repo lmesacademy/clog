@@ -99,7 +99,13 @@ the version itself.
 
 ## Development
 
+Tooling is Bun; the published package is plain JavaScript (CommonJS, an ES
+module build, and type definitions from `tsc`), so it runs on Node 18+ and Bun.
+
 ```sh
-pnpm install
-pnpm test     # builds, then runs test/clog.test.js (Node, and Bun when installed)
+bun install
+bun run test      # builds with tsc, then `bun test`: every fixture runs under Node and Bun
+bun run release   # tests, bumps the version and changelog, then `bun publish`
 ```
+
+Node must be installed to run the tests, since half of them start Node.

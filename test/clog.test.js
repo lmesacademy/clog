@@ -1,8 +1,10 @@
-const assert = require('node:assert/strict');
+// Run with `bun test`. Each fixture is started as a child process under both
+// Node and Bun, since services run clog on both and the stack trace formats
+// (and source map handling) differ between them.
+const { beforeAll, describe, expect, test } = require('bun:test');
 const { execFileSync, spawn } = require('node:child_process');
 const http = require('node:http');
 const path = require('node:path');
-const test = require('node:test');
 const zlib = require('node:zlib');
 
 const root = path.resolve(__dirname, '..');
@@ -35,84 +37,15 @@ function run(command, args, env = {}) {
 
 function byMessage(lines, text) {
   const line = lines.find((entry) => entry.msg.includes(text));
-  assert.ok(line, `no line containing "${text}"`);
+  if (!line) throw new Error(`no line containing "${text}"`);
   return line;
 }
 
-test.before(() => {
-  execFileSync(
-    path.join(root, 'node_modules/.bin/tsc'),
-    ['-p', path.join(fixtures, 'tsconfig.json')],
-    { stdio: 'inherit' }
-  );
-});
-
-test('node with source maps reports the TypeScript line', async () => {
-  const { lines } = await run('node', ['--enable-source-maps', 'dist/app.js']);
-
-  assert.equal(byMessage(lines, 'handled job').caller, 'src/app.ts:11');
-  assert.equal(byMessage(lines, 'plain console').caller, 'src/app.ts:15');
-  assert.equal(byMessage(lines, 'boom').caller, 'src/app.ts:16');
-  // The wrapper file is ignored, so the line is where the wrapper was called.
-  assert.equal(byMessage(lines, 'through wrapper').caller, 'src/app.ts:18');
-  assert.equal(byMessage(lines, 'circular field').caller, 'src/app.ts:22');
-});
-
-test('node without source maps still points at the right call, in the compiled file', async () => {
-  const { lines } = await run('node', ['dist/app.js']);
-  const caller = byMessage(lines, 'handled job').caller;
-  assert.match(caller, /^dist\/app\.js:\d+$/);
-});
-
-test('bun reports the TypeScript line without any flag', async (t) => {
-  try {
-    execFileSync('bun', ['--version']);
-  } catch {
-    t.skip('bun is not installed');
-    return;
-  }
-  const { lines } = await run('bun', ['src/app.ts']);
-  assert.equal(byMessage(lines, 'handled job').caller, 'src/app.ts:11');
-  assert.equal(byMessage(lines, 'plain console').caller, 'src/app.ts:15');
-  assert.equal(byMessage(lines, 'through wrapper').caller, 'src/app.ts:18');
-});
-
-test('fields, errors and service land in the JSON line', async () => {
-  const { lines } = await run('node', ['--enable-source-maps', 'dist/app.js']);
-
-  const handled = byMessage(lines, 'handled job');
-  assert.equal(handled.level, 'info');
-  assert.equal(handled.service, 'fixture');
-  assert.equal(handled.jobId, 7);
-  assert.equal(handled.msg, 'handled job');
-
-  const boom = byMessage(lines, 'boom');
-  assert.equal(boom.level, 'error');
-  assert.equal(boom.msg, 'Error: boom');
-  assert.equal(boom.err.message, 'boom');
-  assert.match(boom.err.stack, /app\.ts:16/);
-
-  const circular = byMessage(lines, 'circular field');
-  assert.equal(circular.circular.self, '[Circular]');
-  assert.equal(circular.big, '9');
-});
-
-test('LOG_LEVEL gates what is printed', async () => {
-  const quiet = await run('node', ['dist/app.js']);
-  assert.ok(!quiet.lines.some((line) => line.level === 'debug'));
-
-  const verbose = await run('node', ['dist/app.js'], { LOG_LEVEL: 'debug' });
-  assert.ok(verbose.lines.some((line) => line.level === 'debug'));
-
-  const warnOnly = await run('node', ['dist/app.js'], { LOG_LEVEL: 'warn' });
-  assert.deepEqual(
-    [...new Set(warnOnly.lines.map((line) => line.level))].sort(),
-    ['error', 'warn']
-  );
-});
-
-test('ships to Better Stack with the real caller and flushes on exit', async () => {
-  // @msgpack/msgpack comes with @logtail/node, which sends msgpack over gzip.
+/**
+ * A local stand-in for Better Stack. @logtail/node sends msgpack over gzip;
+ * the decoder comes with it, so it is resolved from there.
+ */
+async function startSink() {
   const msgpackPath = require.resolve('@msgpack/msgpack', {
     paths: [path.dirname(require.resolve('@logtail/node'))],
   });
@@ -127,38 +60,133 @@ test('ships to Better Stack with the real caller and flushes on exit', async () 
       res.writeHead(202).end();
     });
   });
-  await new Promise((resolve) => server.listen(0, resolve));
-  const { port } = server.address();
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  return {
+    received,
+    endpoint: `http://127.0.0.1:${server.address().port}`,
+    close: () => new Promise((resolve) => server.close(resolve)),
+  };
+}
 
-  try {
-    const { code } = await run('node', ['ship.js'], {
-      LOGTAIL_ENDPOINT: `http://127.0.0.1:${port}`,
-    });
-    assert.equal(code, 0);
-  } finally {
-    server.close();
-  }
-
-  const info = received.find((log) => log.message === 'shipped info');
-  assert.ok(info, 'info line was not shipped');
-  assert.equal(info.level, 'info');
-  assert.equal(info.service, 'ship');
-  assert.equal(info.orderId, 12);
-  assert.equal(info.caller, 'ship.js:8');
-  assert.equal(info.context.runtime.file, 'ship.js');
-  assert.equal(info.context.runtime.line, 8);
-
-  const error = received.find((log) => log.message === 'Error: shipped error');
-  assert.ok(error, 'error line was not shipped');
-  assert.equal(error.context.runtime.line, 9);
-  assert.equal(error.err.message, 'shipped error');
+beforeAll(() => {
+  execFileSync(
+    path.join(root, 'node_modules/.bin/tsc'),
+    ['-p', path.join(fixtures, 'tsconfig.json')],
+    { stdio: 'inherit' }
+  );
 });
 
-test('an unreachable endpoint does not loop or crash the service', async () => {
-  const { code, output } = await run('node', ['ship.js'], {
-    // Nothing listens on port 9, so every send fails.
-    LOGTAIL_ENDPOINT: 'http://127.0.0.1:9',
+describe('caller line', () => {
+  test('node with source maps reports the TypeScript line', async () => {
+    const { lines } = await run('node', ['--enable-source-maps', 'dist/app.js']);
+
+    expect(byMessage(lines, 'handled job').caller).toBe('src/app.ts:11');
+    expect(byMessage(lines, 'plain console').caller).toBe('src/app.ts:15');
+    expect(byMessage(lines, 'boom').caller).toBe('src/app.ts:16');
+    // The wrapper file is ignored, so the line is where the wrapper was called.
+    expect(byMessage(lines, 'through wrapper').caller).toBe('src/app.ts:18');
+    expect(byMessage(lines, 'circular field').caller).toBe('src/app.ts:22');
   });
-  assert.equal(code, 0);
-  assert.ok(output.length < 20000, `output grew to ${output.length} chars`);
+
+  test('node without source maps points at the right call, in the compiled file', async () => {
+    const { lines } = await run('node', ['dist/app.js']);
+    expect(byMessage(lines, 'handled job').caller).toMatch(/^dist\/app\.js:\d+$/);
+  });
+
+  test('bun reports the TypeScript line without any flag', async () => {
+    const { lines } = await run('bun', ['src/app.ts']);
+
+    expect(byMessage(lines, 'handled job').caller).toBe('src/app.ts:11');
+    expect(byMessage(lines, 'plain console').caller).toBe('src/app.ts:15');
+    expect(byMessage(lines, 'boom').caller).toBe('src/app.ts:16');
+    expect(byMessage(lines, 'through wrapper').caller).toBe('src/app.ts:18');
+    expect(byMessage(lines, 'circular field').caller).toBe('src/app.ts:22');
+  });
+});
+
+describe.each([
+  ['node', ['--enable-source-maps', 'dist/app.js']],
+  ['bun', ['src/app.ts']],
+])('output under %s', (command, args) => {
+  test('fields, errors and service land in the JSON line', async () => {
+    const { lines } = await run(command, args);
+
+    const handled = byMessage(lines, 'handled job');
+    expect(handled.level).toBe('info');
+    expect(handled.service).toBe('fixture');
+    expect(handled.jobId).toBe(7);
+    expect(handled.msg).toBe('handled job');
+
+    const boom = byMessage(lines, 'boom');
+    expect(boom.level).toBe('error');
+    expect(boom.msg).toBe('Error: boom');
+    expect(boom.err.message).toBe('boom');
+    expect(boom.err.stack).toMatch(/app\.ts:16/);
+
+    const circular = byMessage(lines, 'circular field');
+    expect(circular.circular.self).toBe('[Circular]');
+    expect(circular.big).toBe('9');
+  });
+
+  test('LOG_LEVEL gates what is printed', async () => {
+    const quiet = await run(command, args);
+    expect(quiet.lines.some((line) => line.level === 'debug')).toBe(false);
+
+    const verbose = await run(command, args, { LOG_LEVEL: 'debug' });
+    expect(verbose.lines.some((line) => line.level === 'debug')).toBe(true);
+
+    const warnOnly = await run(command, args, { LOG_LEVEL: 'warn' });
+    expect([...new Set(warnOnly.lines.map((line) => line.level))].sort()).toEqual([
+      'error',
+      'warn',
+    ]);
+  });
+});
+
+describe.each([['node'], ['bun']])('Better Stack under %s', (command) => {
+  test(
+    'ships with the real caller and flushes on exit',
+    async () => {
+      const sink = await startSink();
+      try {
+        const { code } = await run(command, ['ship.js'], {
+          LOGTAIL_ENDPOINT: sink.endpoint,
+        });
+        expect(code).toBe(0);
+      } finally {
+        await sink.close();
+      }
+
+      const info = sink.received.find((log) => log.message === 'shipped info');
+      expect(info).toBeDefined();
+      expect(info.level).toBe('info');
+      expect(info.service).toBe('ship');
+      expect(info.orderId).toBe(12);
+      expect(info.caller).toBe('ship.js:8');
+      expect(info.context.runtime.file).toBe('ship.js');
+      expect(info.context.runtime.line).toBe(8);
+
+      const error = sink.received.find(
+        (log) => log.message === 'Error: shipped error'
+      );
+      expect(error).toBeDefined();
+      expect(error.context.runtime.line).toBe(9);
+      expect(error.err.message).toBe('shipped error');
+    },
+    20000
+  );
+
+  test(
+    'an unreachable endpoint does not loop or keep the process alive',
+    async () => {
+      const { code, output } = await run(command, ['ship.js'], {
+        // Nothing listens on port 9, so every send fails.
+        LOGTAIL_ENDPOINT: 'http://127.0.0.1:9',
+      });
+      expect(code).toBe(0);
+      expect(output.length).toBeLessThan(20000);
+      expect(output).toContain('[clog] Better Stack send failed');
+    },
+    20000
+  );
 });

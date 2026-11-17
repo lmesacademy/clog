@@ -7,7 +7,6 @@
   "module": "build/module/index.js",
   "repository": "https://github.com/lmesacademy/clog",
   "license": "MIT",
-  "packageManager": "pnpm@9.15.0",
   "keywords": [
     "logger",
     "logtail",
@@ -18,13 +17,14 @@
   },
   "scripts": {
     "build": "rm -rf build && tsc -p tsconfig.json && tsc -p tsconfig.module.json",
-    "test": "pnpm build && node --test test/clog.test.js",
+    "test": "bun run build && bun test",
     "fix:prettier": "prettier \"src/**/*.ts\" --write",
     "example": "bun example/index.ts",
-    "release": "pnpm test && standard-version && npm publish"
+    "release": "bun run test && bunx standard-version && bun publish"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=18",
+    "bun": ">=1.1.30"
   },
   "dependencies": {
     "@logtail/node": "^0.6.1"
