@@ -7,3 +7,4 @@ Clog.init('test-token', { service: 'ship' });
 
 logger.info('shipped info', { orderId: 12 }); // line 8
 console.error(new Error('shipped error')); // line 9
+logger.info('clashing fields', { level: 'gold', dt: 'x', message: 'mine' }); // line 10

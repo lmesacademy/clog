@@ -126,6 +126,20 @@ describe.each([
     const circular = byMessage(lines, 'circular field');
     expect(circular.circular.self).toBe('[Circular]');
     expect(circular.big).toBe('9');
+
+    // A placeholder fills from the object instead of turning it into fields.
+    const paid = byMessage(lines, 'paid');
+    expect(paid.msg).toBe('user { id: 1 } paid');
+    expect(paid.id).toBeUndefined();
+
+    // Fields named like clog's own keys are renamed, not lost or clobbering.
+    const clash = byMessage(lines, 'clashing fields');
+    expect(clash.level).toBe('info');
+    expect(clash.caller).toBe('src/app.ts:25');
+    expect(clash.field_level).toBe('gold');
+    expect(clash.field_dt).toBe('x');
+    expect(clash.field_caller).toBe('me');
+    expect(clash.plan).toBe('pro');
   });
 
   test('LOG_LEVEL gates what is printed', async () => {
@@ -226,6 +240,16 @@ describe.each([['node'], ['bun']])('Better Stack under %s', (command) => {
       expect(error).toBeDefined();
       expect(error.context.runtime.line).toBe(9);
       expect(error.err.message).toBe('shipped error');
+
+      // Logtail spreads fields after its own level and timestamp, so these
+      // would have replaced them without the rename.
+      const clash = sink.received.find((log) => log.message === 'clashing fields');
+      expect(clash).toBeDefined();
+      expect(clash.level).toBe('info');
+      expect(clash.dt).not.toBe('x');
+      expect(clash.field_level).toBe('gold');
+      expect(clash.field_dt).toBe('x');
+      expect(clash.field_message).toBe('mine');
     },
     20000
   );

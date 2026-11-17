@@ -20,3 +20,6 @@ wrappedLog('through wrapper'); // line 18
 const circular: Record<string, unknown> = { name: 'loop' };
 circular.self = circular;
 logger.warn('circular field', { circular, big: BigInt(9) }); // line 22
+
+logger.info('user %o paid', { id: 1 }); // line 24
+logger.info('clashing fields', { level: 'gold', dt: 'x', caller: 'me', plan: 'pro' }); // line 25

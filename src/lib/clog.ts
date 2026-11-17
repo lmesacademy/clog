@@ -205,6 +205,41 @@ type Entry = {
   err?: SerializedError;
 };
 
+/** The substitutions util.format (and so console.log) understands. */
+const FORMAT_PLACEHOLDER = /%[sdifjoOc]/;
+
+/**
+ * Keys clog or Better Stack set on every log. Logtail puts the fields after
+ * its own `dt` and `level`, so a field called `level` would replace the real
+ * level and drop the line out of level filters and error alerts.
+ */
+const RESERVED_FIELDS = new Set([
+  'dt',
+  'level',
+  'message',
+  'time',
+  'msg',
+  'service',
+  'caller',
+  'err',
+  'context',
+]);
+
+/** Renames clashing fields to `field_<name>` so neither side is lost. */
+function safeFields(
+  fields: Record<string, unknown> | undefined
+): Record<string, unknown> | undefined {
+  if (!fields) return fields;
+  let renamed: Record<string, unknown> | undefined;
+  for (const key of Object.keys(fields)) {
+    if (!RESERVED_FIELDS.has(key)) continue;
+    renamed = renamed || { ...fields };
+    renamed[`field_${key}`] = renamed[key];
+    delete renamed[key];
+  }
+  return renamed || fields;
+}
+
 /**
  * Turns console-style arguments into a message plus searchable fields.
  *
@@ -216,12 +251,15 @@ function buildEntry(args: unknown[]): Entry {
   const entry: Entry = { message: '' };
   let rest = args;
 
+  // `console.log('user %o paid', user)` asks for the object inside the text;
+  // pulling it out as fields would leave "%o" in the message.
   if (
     args.length >= 2 &&
     typeof args[0] === 'string' &&
+    !FORMAT_PLACEHOLDER.test(args[0]) &&
     isPlainObject(args[args.length - 1])
   ) {
-    entry.fields = args[args.length - 1] as Record<string, unknown>;
+    entry.fields = safeFields(args[args.length - 1] as Record<string, unknown>);
     rest = args.slice(0, -1);
   }
 
@@ -288,6 +326,9 @@ function emit(
       originalConsole[method](...args);
     }
     if (!enabled) return;
+    // Printed already, and nothing to ship: skip the stack trace and the
+    // entry, which would cost every console.log in development for nothing.
+    if (mode === 'console' && !state.logtail) return;
 
     const caller = findCaller();
 
