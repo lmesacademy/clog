@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.2](https://github.com/lmesacademy/clog/compare/v0.1.1...v0.1.2) (2026-11-17)
+
+
+### Bug Fixes
+
+* keep placeholders, rename clashing fields, skip work in dev ([18c64c0](https://github.com/lmesacademy/clog/commit/18c64c096ad3d627f5e7ec58d18831e304dff74d))
+
 ### [0.1.1](https://github.com/lmesacademy/clog/compare/v0.1.0...v0.1.1) (2026-11-17)
 
 

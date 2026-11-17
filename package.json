@@ -1,6 +1,6 @@
 {
   "name": "@lmes/clog",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Levelled logger that reports the real caller line and ships to Better Stack",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
