@@ -73,17 +73,44 @@ logger.info('message sent', { to: maskPhone(phone), body: textSummary(text) });
 
 ## Shutdown
 
-Logs are sent in batches about once a second. A process that ends on its own is
-flushed automatically. Before calling `process.exit()`, flush first:
+Logs are sent in batches about once a second, so up to a second of logs is
+still in memory at any moment. A process that ends on its own (a script that
+runs out of work) is flushed automatically. Every other way out needs a flush:
+
+**Before `process.exit()`:**
 
 ```ts
 await Clog.flush();
 process.exit(0);
 ```
 
-If Better Stack cannot be reached, clog prints one `[clog] Better Stack send
-failed: ...` line per failed batch to stderr and keeps logging to stdout. It
-never ships its own failure reports, so a network outage cannot loop.
+**When the container stops.** Docker, CapRover and Dokploy stop a container
+with `SIGTERM`. Without a handler, Node and Bun exit immediately and the last
+batch is lost, which is usually the shutdown error you most want to see. clog
+does not install a handler itself, because that would change how every service
+exits. Add the flush to the service's own shutdown:
+
+```ts
+async function shutdown(signal: string) {
+  logger.info('shutting down', { signal });
+  await worker.close(); // stop taking work first: BullMQ workers, HTTP server, pools
+  await Clog.flush(); // last, so the lines logged while closing are sent too
+  process.exit(0);
+}
+
+process.once('SIGTERM', () => void shutdown('SIGTERM'));
+process.once('SIGINT', () => void shutdown('SIGINT'));
+```
+
+If the service already has a shutdown handler, add `await Clog.flush()` as its
+last step before `process.exit()`. Keep the whole handler under the platform's
+stop timeout (10 seconds by default in Docker), or the process is killed before
+the flush finishes.
+
+If Better Stack cannot be reached, logging carries on and the failures are
+reported on stderr: one `[clog] Better Stack send failed: ...` line per failed
+batch in `json` mode, or Logtail's own error in `console` mode. clog never
+ships its own failure reports, so a network outage cannot loop.
 
 ## Upgrading from 0.0.x
 
